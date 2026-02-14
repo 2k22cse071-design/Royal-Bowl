@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+
+  <title>Royal Bowl</title>
+
+  <link rel="stylesheet" href="css/cart.css">
+  <style>
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .login-box {
+      background: #710303;
+      padding: 70px;
+      border-radius: 50px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 380px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #0a0a0a;
+    }
+
+    .login-box input {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .login-box button {
+      background-color: #111111;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    .login-box button:hover {
+      background-color: #00bcd4;
+    }
+
+    #msg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+    :root {
+      --accent: #f42525;
+      --bg: #0b0b0b;
+      --card: #f8f7f7
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: #fff;
+      margin: 0
+    }
+
+    h1,
+    h2,
+    h3,
+    .logo,
+    .navbar,
+    .btn,
+    button {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    section {
+      padding: 14px
+    }
+
+    /* Menu Item selection layout only (image/text removed) */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .menu-item {
+      width: 250px;
+      text-align: center;
+      background: var(--card);
+      color: #111;
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: transform .15s;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-3px)
+    }
+
+    /* Checkbox hidden */
+    .menu-item input[type="checkbox"] {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      opacity: 0;
+      width: 22px;
+      height: 22px
+    }
+
+    .menu-item.selected {
+      outline: 2px solid var(--accent);
+    }
+
+    /* Cart & Buttons */
+    #cart {
+      background: #710303;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      margin: 12px;
+    }
+
+    .btn {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    #dummy-result {
+      margin-top: 12px;
+      color: #fff
+    }
+
+
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      background-color: black;
+    }
+
+    .amatic-sc-bold {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .header {
+      background-image: url('./BIRI.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 550px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: index 10000;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+
+    .navbar .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .navbar .nav-links a:hover {
+      color: #f42525;
+    }
+
+    .parallax {
+      /* The image used */
+      background-image: url("./bgb012.jpeg");
+
+      /* Set a specific height */
+      min-height: 500px;
+
+      /* Create the parallax scrolling effect */
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    /* Section Styles */
+    section {
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+
+    h1,
+    h2 {
+      color: white;
+    }
+
+    p {
+      color: white;
+      line-height: 1.6;
+    }
+
+    .menu-item {
+      display: inline-block;
+      width: 30%;
+      margin: 1rem;
+      background-color: #f8f7f7;
+      padding: 1rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+
+    .menu-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+      /* Zoom-in & Zoom-out on hover / touch */
+      transition: transform 0.4s ease-in-out;
+      /* smooth animation */
+    }
+
+    .menu-item img:hover {
+      transform: scale(1.15);
+      /* zoom in */
+    }
+
+    .menu-item h3 {
+      margin-top: 1rem;
+    }
+
+    .menu-item p {
+      color: #777;
+    }
+
+    /* Contact Form */
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .contact-form button {
+      padding: 1rem 2rem;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .contact-form button:hover {
+      background-color: #00bcd4;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar .nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 1rem;
+        background-color: #444;
+        position: absolute;
+        top: 3rem;
+        right: 0;
+        width: 200px;
+        padding: 1rem;
+        border-radius: 5px;
+      }
+
+      .navbar .nav-links.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .menu-item {
+        width: 80%;
+        margin: 1rem auto;
+      }
+    }
+
+    /* Footer styling */
+    .footer {
+      background-color: #710303;
+      color: rgb(233, 233, 233);
+      text-align: center;
+      padding: 20px;
+      margin-top: 20px;
+    }
+  </style>
+  <script src="contact.js"></script>
+
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+
+  <!-- Header -->
+  <div>
+    <div class="header">
+      <h1 style="color:rgb(236, 227, 227)" ;>ROYAL BOWL</h1>
+    </div>
+  </div>
+
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">ROYAL BOWL</div>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li id="admin-report-link" style="display:none;"><a href="report.html">📊 Report</a></li>
+      <li id="login-link"><a href="login.html">Login</a></li>
+      <li id="account-link" style="display:none;"><a href="#" onclick="showAccount()">👤 Account</a></li>
+      <li id="logout-link" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+    <div class="cart-icon-container" onclick="toggleCart()">
+      <span class="cart-icon">🛒</span>
+      <span id="cart-count" class="cart-badge">0</span>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  </nav>
+  <div class="parallax"></div>
+
+  <!-- Hero Section -->
+  <section id="home" style="background-color: #7a0101;">
+    <h1>Welcome to ROYAL BOWL</h1>
+    <p>Biryani is a South Asian one-pot dish in which lamb,
+      mutton, beef, chicken, seafood, or a mixture of vegetables is
+      layered with rice.</p>
+    <marquee
+      Style="text-transform:capitalize;color:rgb(0, 0, 0,0.5); background-color: #7a0101;font-weight: bold;padding: 10px;color:white;text-align: center;">
+      OPENING FROM 11AM TO 11PM</marquee>
+  </section>
+  <div class="parallax"></div>
+
+
+
+  <section id="menu">
+    <h2 style="color:#fff">World Best Fire Wood Biriyani</h2>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img class="thumb" src="./BIRIYANI2.webp" alt="Mutton Biryani">
+        <h3>Mutton Biryani</h3>
+        <p class="price">Rs 350</p>
+        <button class="add-btn" onclick="addToCart('Mutton Biryani', 350, './BIRIYANI2.webp')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./gbiriyani.jpg" alt="Ginger Chicken Biryani">
+        <h3>Ginger Chicken Biryani</h3>
+        <p class="price">Rs 320</p>
+        <button class="add-btn" onclick="addToCart('Ginger Chicken Biryani', 320, './gbiriyani.jpg')">Add to
+          Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./kfbiriyani.avif" alt="Fish Biryani">
+        <h3>Fish Biryani</h3>
+        <p class="price">Rs 300</p>
+        <button class="add-btn" onclick="addToCart('Fish Biryani', 300, './kfbiriyani.avif')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./tc.jpg" alt="Tandoori chicken">
+        <h3>Tandoori chicken</h3>
+        <p><B>FULL(4Pcs)</B></p>
+        <p class="price">Rs 400</p>
+        <button class="add-btn" onclick="addToCart('Tandoori chicken', 400, './tc.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./tcs.jpg" alt="Tandoori chicken sanwich">
+        <h3>Tandoori chicken sanwich</h3>
+        <p class="price">Rs 270</p>
+        <button class="add-btn" onclick="addToCart('Tandoori chicken sanwich', 270, './tcs.jpg')">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="parallax"></div>
+
+  <section id="bucket-menu">
+    <h2>BUCKET BIRIYANI</h2>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img class="thumb" src="./BTBIRIYANI.jpg" alt="Family Mutton Bucket Biriyani">
+        <h3>Family Mutton Bucket Biriyani</h3>
+        <p class="price">Rs 2050</p>
+        <button class="add-btn" onclick="addToCart('Family Mutton Bucket Biriyani', 2050, './BTBIRIYANI.jpg')">Add to
+          Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./pbtbiriyani.webp" alt="Party Chicken Bucket Biriyani">
+        <h3>Party Chicken Bucket Biriyani</h3>
+        <p class="price">Rs 2000</p>
+        <button class="add-btn" onclick="addToCart('Party Chicken Bucket Biriyani', 2000, './pbtbiriyani.webp')">Add to
+          Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="parallax"></div>
+
+  <section id="sidedish-menu">
+    <h2>NonVeg-Sidedish</h2>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img class="thumb" src="./clp.webp" alt="Chicken Lollipop">
+        <h3>Chicken Lollipop</h3>
+        <p class="price">Rs 290</p>
+        <button class="add-btn" onclick="addToCart('Chicken Lollipop', 290, './clp.webp')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./shawarma.jpg" alt="shawarma">
+        <h3>shawarma</h3>
+        <p class="price">Rs 210</p>
+        <button class="add-btn" onclick="addToCart('shawarma', 210, './shawarma.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./Dragon-Chicken-.jpg" alt="Dragon Chicken">
+        <h3>Dragon Chicken</h3>
+        <p class="price">Rs 280</p>
+        <button class="add-btn" onclick="addToCart('Dragon Chicken', 280, './Dragon-Chicken-.jpg')">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="sidedish-extra">
+    <h2>Sidedish</h2>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img class="thumb" src="./strawberry-milkshake-.avif" alt="Milkshakes">
+        <h3>Milkshakes</h3>
+        <p class="price">Rs 285</p>
+        <button class="add-btn" onclick="addToCart('Milkshakes', 285, './strawberry-milkshake-.avif')">Add to
+          Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./mojito.png" alt="Mojito">
+        <h3>Mojito</h3>
+        <p class="price">Rs 80</p>
+        <button class="add-btn" onclick="addToCart('Mojito', 80, './mojito.png')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./trifle6.jpg" alt="Falooda">
+        <h3>Falooda</h3>
+        <p class="price">Rs 340</p>
+        <button class="add-btn" onclick="addToCart('Falooda', 340, './trifle6.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="menu-item">
+        <img class="thumb" src="./bowl-fruit-salad.avif" alt="Fruit salad">
+        <h3>Fruit salad</h3>
+        <p class="price">Rs 180</p>
+        <button class="add-btn" onclick="addToCart('Fruit salad', 180, './bowl-fruit-salad.avif')">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+  <script src="js/cart.js"></script>
+  <div class="parallax"></div>
+
+  <!-- About Section -->
+  <section id="about" style="background-color: #760505;">
+    <h1>About Us</h1>
+    <h2>OUR HISTORY</h2>
+    <h2>Serving Biryani To Customers</h2>
+    <p>No dreamer is ever too small, no dream ever too big. Salem RR has
+      come a long way. There are older restaurants and places with
+      cooler backstories maybe, but for nearly 20 plus years, everyone
+      in Chennai and beyond, young and old, is familiar with ‘Salem RR
+      Biryani’. The early days were tougher times, but Mr. RR
+      Tamilselvan single-handedly made ‘Empire’ possible and together
+      with his family he ran the business with grit and fervour.
+
+      Exotic food like biryani and chickens were served, and also
+      affordable price. They consistently built rapport, making each
+      interaction with customers unique; such was their passion, a
+      sure winner all the wayAt Delicious Eats, we provide a
+      delightful culinary experience
+      with a wide variety of dishes made from the finest
+      ingredients.</p>
+  </section>
+
+  <script>
+    // Check for token and role to update UI
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      const username = localStorage.getItem('username');
+
+      if (token) {
+        // Admin Check
+        const reportLink = document.getElementById('admin-report-link');
+        const transSection = document.getElementById('admin-transaction-section');
+
+        if (role === 'admin') {
+          if (reportLink) reportLink.style.display = 'block';
+          if (transSection) transSection.style.display = 'block';
+        } else {
+          if (reportLink) reportLink.style.display = 'none';
+          if (transSection) transSection.style.display = 'none';
+        }
+
+        // LOGGED IN STATE: Show Account/Logout, Hide Login
+        const loginLink = document.getElementById('login-link');
+        const logoutLink = document.getElementById('logout-link');
+        const accountLink = document.getElementById('account-link');
+
+        if (loginLink) loginLink.style.display = 'none';
+        if (logoutLink) logoutLink.style.display = 'block';
+        if (accountLink) accountLink.style.display = 'block';
+
+        // Update account text
+        const accLink = document.querySelector('#account-link a');
+        if (accLink) accLink.innerText = `👤 ${username || 'Account'}`;
+
+      } else {
+        // GUEST STATE: Hide Account/Logout, Show Login
+        const reportLink = document.getElementById('admin-report-link');
+        if (reportLink) reportLink.style.display = 'none';
+
+        const loginLink = document.getElementById('login-link');
+        const logoutLink = document.getElementById('logout-link');
+        const accountLink = document.getElementById('account-link');
+
+        if (loginLink) loginLink.style.display = 'block';
+        if (logoutLink) logoutLink.style.display = 'none';
+        if (accountLink) accountLink.style.display = 'none';
+      }
+    });
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        alert('Logged out successfully!');
+        window.location.href = 'index.html'; // Redirect to home on logout
+      }
+    }
+
+    function showAccount() {
+      const u = localStorage.getItem('username') || 'User';
+      const r = localStorage.getItem('role') || 'Guest';
+      alert(`✅ Logged in as: ${u}\n🔑 Role: ${r}`);
+    }
+  </script>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <form class="contact-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" required></textarea>
+      <button onclick="sendMsg(event)">Send Message</button>
+    </form>
+  </section>
+
+
+  <div id="admin-transaction-section" style="display: none;">
+    <h2 style="text-align:center;color:#fff;">Add Transaction</h2>
+    <form onsubmit="addTransaction(event)" style="text-align:center;">
+      <input type="date" id="date" required><br><br>
+      <input type="number" id="amount" placeholder="Amount" required><br><br>
+      <input type="text" id="description" placeholder="Description" required><br><br>
+      <select id="type" required>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select><br><br>
+      <button type="submit">Add Transaction</button>
+    </form>
+    <script src="transaction.js"></script>
+  </div>
+
+  <script>
+    function sendMsg(event) {
+      event.preventDefault(); // form submit ahh stop pannum
+      alert("Message Sent Successfully ✅");  // success message
+      // form clear panna
+      event.target.reset();
+      return false;
+    }
+  </script>
+
+  <script>
+    // Toggle menu on small screens
+    function toggleMenu() {
+      const navLinks = document.querySelector('.nav-links');
+      if (navLinks.style.display === 'flex') {
+        navLinks.style.display = 'none';
+      } else {
+        navLinks.style.display = 'flex';
+        navLinks.style.flexDirection = 'column';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '60px';
+        navLinks.style.right = '0';
+        navLinks.style.background = 'rgba(0,0,0,0.9)';
+        navLinks.style.width = '200px';
+        navLinks.style.padding = '20px';
+      }
+    }
+  </script>
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h2>Your Cart</h2>
+        <button class="close-cart" onclick="toggleCart()">×</button>
+      </div>
+      <div id="cart-items" class="cart-items">
+        <!-- Items will be injected here -->
+      </div>
+      <div class="cart-footer">
+        <div class="cart-total-row">
+          <span>Total:</span>
+          <span>₹<span id="cart-total">0</span></span>
+        </div>
+        <!-- Simple Order form in checkout flow or just name/phone prompt in JS -->
+        <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p style="color:white;">&copy;2025 ROYAL BOWL. All Rights Reserved</p>
+  </div>
+
+
+  <script>
+    async function sendMsg(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const name = form[0].value.trim();
+      const email = form[1].value.trim();
+      const message = form[2].value.trim();
+
+      if (!name || !email || !message) {
+        alert("Please fill all fields!");
+        return false;
+      }
+
+      try {
+        const res = await fetch("http://localhost:5000/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message })
+        });
+
+
+        fetch("http://localhost:3000/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message })
+        })
+
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("✅ Message sent successfully!");
+          form.reset();
+        } else {
+          alert("⚠️ " + data.message);
+        }
+      } catch (err) {
+        alert("❌ Server not responding. Is backend running?");
+        console.error(err);
+      }
+
+      return false;
+    }
+
+  </script>
+  <script src="contact.js"></script>
+
+</body>
+
+</html>
