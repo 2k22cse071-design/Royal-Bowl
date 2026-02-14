@@ -132,8 +132,10 @@
             // Client-side fallback to ensure user can ALWAYS enter
             localStorage.setItem('token', 'guest_fallback_token_' + Date.now());
 
+            const cleanUser = (username || "").trim().toLowerCase();
+
             // DEMO MODE ADMIN: If username is 'admin', grant admin role
-            if (username && username.toLowerCase() === 'admin') {
+            if (cleanUser === 'admin') {
                 localStorage.setItem('role', 'admin');
                 localStorage.setItem('username', 'Admin (Demo)');
                 window.location.href = 'admin.html';
