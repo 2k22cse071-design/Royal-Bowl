@@ -156,7 +156,44 @@
                 `;
                 document.getElementById('orders-list').innerHTML = html;
             } catch (err) {
-                console.error(err);
+                console.error("Backend unreachable, showing demo data:", err);
+                const demoOrders = [
+                    { id: 101, customer_name: "John Doe (Demo)", total_amount: 1250, status: "Pending" },
+                    { id: 102, customer_name: "Jane Smith (Demo)", total_amount: 850, status: "Completed" },
+                    { id: 103, customer_name: "Mike Ross (Demo)", total_amount: 2100, status: "Pending" }
+                ];
+                
+                const html = `
+                    <div style="background:orange; color:white; padding:10px; margin-bottom:10px;">
+                        ⚠️ Demo Mode: Backend not connected associated with GitHub Pages static hosting.
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${demoOrders.map(order => `
+                                <tr>
+                                    <td>${order.id}</td>
+                                    <td>${order.customer_name}</td>
+                                    <td>₹${order.total_amount}</td>
+                                    <td>${order.status}</td>
+                                    <td>
+                                        <button onclick="alert('Demo Mode: Cannot update live status')">Complete</button>
+                                        <button onclick="alert('Demo Mode: Cannot update live status')">Cancel</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('orders-list').innerHTML = html;
             }
         }
 
