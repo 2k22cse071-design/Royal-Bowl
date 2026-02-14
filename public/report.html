@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    h1{
+        font-family:"Amatic SC", serif;
+        font-weight: 400;
+        font-style: normal;
+        background-color: black;
+      }
+    .amatic-sc-bold {
+      font-family: "Amatic SC", serif;
+      font-weight: 700;
+      font-style: normal;
+    }
+    
+    body{
+    background-color: black;
+    }
+    title{
+        font-family:"Amatic SC", serif;
+        font-weight: 400;
+        font-style: normal;
+        background-color: black;
+      }
+    .amatic-sc-bold {
+      font-family: "Amatic SC", serif;
+      font-weight: 700;
+      font-style: normal;
+    }
+   
+    h1 {
+      text-align: center;
+      color: white;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background:  #710303;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    .filter {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    select {
+      padding: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 ROYAL BOWL Transaction Report</h1>
+  <div class="filter">
+    <label>View: </label>
+    <select id="filter" onchange="loadReport()">
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+
+  <table id="reportTable">
+    <thead>
+      <tr>
+        <B><th>ID</th>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Amount</th></B>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadReport() {
+      const filter = document.getElementById("filter").value;
+      const response = await fetch(`http://localhost:3000/report?type=${filter}`);
+      const data = await response.json();
+      const tbody = document.querySelector("#reportTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.date}</td>
+          <td>${row.description}</td>
+          <td>${row.type}</td>
+          <td>₹${row.amount}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>

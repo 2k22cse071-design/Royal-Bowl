@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Royal Bowl</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: #f4f4f4;
+            padding: 10px;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .status-btn {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+    <div class="grid">
+        <div class="sidebar">
+            <a href="#" onclick="showSection('orders')">Orders</a>
+            <a href="#" onclick="showSection('menu')">Menu Management</a>
+            <a href="#" onclick="showSection('reports')">Reports</a>
+        </div> <!-- Added reports link -->
+        <div class="content">
+            <div id="orders-section">
+                <h2>Recent Orders</h2>
+                <div id="orders-list"></div>
+            </div>
+            <div id="menu-section" style="display:none;">
+                <h2>Menu Items</h2>
+                <!-- Menu management UI would go here -->
+                <p>Coming soon...</p>
+            </div>
+            <div id="reports-section" style="display:none;">
+                <h2>Sales Reports</h2>
+                <p><a href="/report.html" target="_blank">View Detailed Reports</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+
+        if (!token) {
+            window.location.href = '/login.html';
+        } else if (role !== 'admin') {
+            alert("Access Denied: Admins Only 🛑");
+            window.location.href = '/index.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('username');
+            window.location.href = '/index.html'; // Redirect to home page
+        }
+
+        function showSection(section) {
+            document.getElementById('orders-section').style.display = section === 'orders' ? 'block' : 'none';
+            document.getElementById('menu-section').style.display = section === 'menu' ? 'block' : 'none';
+            document.getElementById('reports-section').style.display = section === 'reports' ? 'block' : 'none';
+        }
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/api/orders', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const orders = await response.json();
+
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders.map(order => `
+                                <tr>
+                                    <td>${order.id}</td>
+                                    <td>${order.customer_name}</td>
+                                    <td>₹${order.total_amount}</td>
+                                    <td>${order.status}</td>
+                                    <td>
+                                        <button onclick="updateStatus(${order.id}, 'Completed')">Complete</button>
+                                        <button onclick="updateStatus(${order.id}, 'Cancelled')">Cancel</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('orders-list').innerHTML = html;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function updateStatus(id, status) {
+            await fetch(`/api/orders/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+            fetchOrders();
+        }
+
+        fetchOrders();
+    </script>
+</body>
+
+</html>
