@@ -225,7 +225,16 @@
                 }
             } catch (error) {
                 console.error("Error placing order:", error);
-                alert("Network error.");
+
+                // Demo Mode Fallback for GitHub Pages
+                // Since there is no backend, we simulate success so the user can see the flow.
+                if (confirm("Backend not reachable (GitHub Pages Mode). simulate success?")) {
+                    alert(`Order Placed Successfully! (Demo Mode)`);
+                    localStorage.removeItem('cart');
+                    window.location.href = 'index.html';
+                } else {
+                    alert("Network error. Backend not running.");
+                }
             }
         });
     </script>
