@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Royal Bowl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0b0b0b;
+            --surface: #141414;
+            --card: #1c1c1c;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #e63939;
+            --text: #f0f0f0;
+            --muted: #777;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(14, 14, 14, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .navbar-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .navbar-links a:hover,
+        .navbar-links a.active {
+            color: var(--text);
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }        .page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 36px 20px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }        .loading,
+        .empty-state {
+            text-align: center;
+            padding: 64px 20px;
+            color: var(--muted);
+        }
+
+        .loading-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 14px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .empty-state p {
+            font-size: 0.88rem;
+        }
+
+        .btn-order {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+        }
+
+        .btn-order:hover {
+            background: #c82b2b;
+            transform: translateY(-1px);
+        }        .order-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 18px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .order-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .order-id {
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-family: monospace;
+        }
+
+        .order-date {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .order-amount {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #81c784;
+        }        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-pill.pending {
+            background: rgba(255, 193, 7, 0.12);
+            color: #f7c948;
+        }
+
+        .status-pill.confirmed {
+            background: rgba(25, 118, 210, 0.12);
+            color: #4fc3f7;
+        }
+
+        .status-pill.preparing {
+            background: rgba(245, 124, 0, 0.12);
+            color: #ffb74d;
+        }
+
+        .status-pill.ready {
+            background: rgba(56, 142, 60, 0.12);
+            color: #81c784;
+        }
+
+        .status-pill.completed {
+            background: rgba(76, 175, 80, 0.12);
+            color: #4caf50;
+        }
+
+        .status-pill.cancelled {
+            background: rgba(117, 117, 117, 0.12);
+            color: #9e9e9e;
+        }        .order-progress {
+            padding: 22px 22px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-track {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            border: 2px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            transition: all 0.4s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle.done {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border-color: #4caf50;
+            color: #fff;
+        }
+
+        .step-circle.active {
+            background: linear-gradient(135deg, var(--accent), #c82b2b);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(230, 57, 57, 0.2);
+        }
+
+        .step-circle.cancelled {
+            background: #333;
+            border-color: #555;
+            color: #666;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            position: relative;
+            z-index: 1;
+            margin: 0 -2px;
+            margin-top: -16px;
+        }
+
+        .step-line.done {
+            background: #4caf50;
+        }
+
+        .step-label {
+            font-size: 0.68rem;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .step-label.done {
+            color: #4caf50;
+        }
+
+        .step-label.active {
+            color: var(--accent);
+            font-weight: 600;
+        }        .order-items {
+            padding: 14px 22px 18px;
+        }
+
+        .order-items-title {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.88rem;
+        }
+
+        .order-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-name {
+            color: var(--text);
+        }
+
+        .order-item-qty {
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .order-item-price {
+            color: #81c784;
+            font-weight: 600;
+        }        .order-address {
+            padding: 0 22px 16px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }        @media (max-width: 600px) {
+            .page {
+                padding: 20px 14px 60px;
+            }
+
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-links {
+                display: none;
+            }
+
+            .step-label {
+                font-size: 0.6rem;
+            }
+
+            .order-card-header {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="home.html" class="logo">🍛 ROYAL BOWL</a>
+        <ul class="navbar-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="my-orders.html" class="active">My Orders</a></li>
+        </ul>
+        <a href="home.html" class="btn-back">← Back to Menu</a>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <h1>📦 My Orders</h1>
+            <p>Track the real-time status of your orders</p>
+        </div>
+
+        <div id="phone-lookup" style="display:none; margin-bottom:24px;">
+            <div
+                style="background:#1c1c1c; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:22px 24px;">
+                <p style="color:#aaa; font-size:0.88rem; margin-bottom:12px;">🔍 Enter the phone number you used when
+                    ordering to see all your orders:</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <input id="phone-input" type="tel" placeholder="e.g. 9876543210" style="flex:1; min-width:180px; padding:10px 14px; background:#111; border:1px solid rgba(255,255,255,0.12);
+                   border-radius:8px; color:#f0f0f0; font-size:0.9rem; font-family:inherit; outline:none;">
+                    <button onclick="lookupByPhone()" style="padding:10px 20px; background:#e63939; border:none; border-radius:8px; color:#fff;
+                   font-weight:600; font-size:0.88rem; cursor:pointer; font-family:inherit; white-space:nowrap;">
+                        Find Orders
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="orders-container">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading your orders...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username') || '';
+
+        const STEPS = [
+            { key: 'Pending', icon: '🕐', label: 'Placed' },
+            { key: 'Confirmed', icon: '✅', label: 'Confirmed' },
+            { key: 'Preparing', icon: '🍳', label: 'Preparing' },
+            { key: 'Ready', icon: '🛎️', label: 'Ready' },
+            { key: 'Completed', icon: '🎉', label: 'Delivered' },
+        ];
+
+        function getStepIndex(status) {
+            if (status === 'Cancelled') return -1;
+            return STEPS.findIndex(s => s.key === status);
+        }
+
+        function progressBar(status) {
+            if (status === 'Cancelled') {
+                return `<div class="order-progress">
+          <div style="text-align:center;padding:10px 0;color:#9e9e9e;font-size:0.88rem;">❌ This order was cancelled.</div>
+        </div>`;
+            }
+            const currentIdx = getStepIndex(status);
+            let html = '<div class="order-progress"><div class="progress-track">';
+            STEPS.forEach((step, i) => {
+                const isDone = i < currentIdx;
+                const isActive = i === currentIdx;
+                const cls = isDone ? 'done' : isActive ? 'active' : '';
+                if (i > 0) html += `<div class="step-line ${isDone ? 'done' : ''}"></div>`;
+                html += `<div class="progress-step">
+          <div class="step-circle ${cls}">${isDone ? '✓' : step.icon}</div>
+          <span class="step-label ${cls}">${step.label}</span>
+        </div>`;
+            });
+            html += '</div></div>';
+            return html;
+        }
+
+        function fmtDate(str) {
+            if (!str) return '';
+            try {
+                return new Date(str).toLocaleString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch { return str; }
+        }
+
+        function statusPill(status) {
+            const cls = (status || 'pending').toLowerCase();
+            const icons = { pending: '⏳', confirmed: '✅', preparing: '🍳', ready: '🛎️', completed: '🎉', cancelled: '❌' };
+            return `<span class="status-pill ${cls}">${icons[cls] || '•'} ${status}</span>`;
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('orders-container');
+            if (!orders || orders.length === 0) {
+                document.getElementById('phone-lookup').style.display = 'block';
+                container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🛍️</div>
+            <h3>No orders found</h3>
+            <p>Enter your phone number above to find previous orders, or place a new one!</p>
+            <a href="home.html#menu" class="btn-order">🍽️ Browse Menu</a>
+          </div>`;
+                return;
+            }
+            document.getElementById('phone-lookup').style.display = 'none';
+
+            const html = orders.map(order => {
+                const rawItems = order.items;
+                let items = [];
+                if (Array.isArray(rawItems)) items = rawItems;
+                else if (typeof rawItems === 'string') {
+                    try { items = JSON.parse(rawItems); } catch { items = []; }
+                }
+
+                const itemsHtml = items.length
+                    ? items.map(it => `
+              <div class="order-item-row">
+                <span class="order-item-name">${it.name || it.item_name || '—'}</span>
+                <span class="order-item-qty">×${it.qty || it.quantity || 1}</span>
+                <span class="order-item-price">₹${(parseFloat(it.price) || 0) * (it.qty || it.quantity || 1)}</span>
+              </div>`).join('')
+                    : `<div class="order-item-row"><span style="color:var(--muted);font-size:0.82rem;">Item details not available</span></div>`;
+
+                return `
+          <div class="order-card">
+            <div class="order-card-header">
+              <div class="order-meta">
+                <span class="order-id">Order #${order.id}</span>
+                <span class="order-date">${fmtDate(order.created_at)}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                ${statusPill(order.status || 'Pending')}
+                <span class="order-amount">₹${order.total_amount || 0}</span>
+              </div>
+            </div>
+            ${progressBar(order.status || 'Pending')}
+            <div class="order-items">
+              <div class="order-items-title">Items Ordered</div>
+              ${itemsHtml}
+            </div>
+            ${order.address ? `<div class="order-address"><span>📍</span><span>${order.address}</span></div>` : ''}
+          </div>`;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+        function mergeOrders(backendOrders, localOrders) {
+            const map = new Map();
+            localOrders.forEach(o => map.set(o.id, o));
+            backendOrders.forEach(o => {
+                const local = map.get(o.id);
+                map.set(o.id, { ...(local || {}), ...o });
+            });
+            return [...map.values()].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        }
+
+        async function loadOrders(phone) {
+            const savedPhone = phone || localStorage.getItem('my_phone') || '';
+            const localOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+
+            document.getElementById('orders-container').innerHTML =
+                `<div class="loading"><div class="loading-spinner"></div><p>Loading orders...</p></div>`;
+
+            let backendOrders = [];
+            try {
+                const url = '/api/orders/my' + (savedPhone ? `?phone=${encodeURIComponent(savedPhone)}` : '');
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    backendOrders = await res.json();
+                    if (backendOrders.length > 0) {
+                        const updated = localOrders.map(lo => {
+                            const fresh = backendOrders.find(bo => bo.id === lo.id);
+                            return fresh ? { ...lo, status: fresh.status } : lo;
+                        });
+                        localStorage.setItem('my_orders', JSON.stringify(updated));
+                    }
+                }
+            } catch { /* backend unreachable, use local only */ }
+
+            const merged = mergeOrders(backendOrders, localOrders);
+            renderOrders(merged);
+            if (merged.length === 0) {
+                document.getElementById('phone-lookup').style.display = 'block';
+            }
+        }
+
+        function lookupByPhone() {
+            const phone = document.getElementById('phone-input').value.trim();
+            if (!phone) { alert('Please enter your phone number.'); return; }
+            localStorage.setItem('my_phone', phone);
+            loadOrders(phone);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const inp = document.getElementById('phone-input');
+            if (inp) inp.addEventListener('keypress', e => { if (e.key === 'Enter') lookupByPhone(); });
+        });
+        loadOrders();
+        setInterval(() => loadOrders(), 15000);
+    </script>
+
+</body>
+
+</html>

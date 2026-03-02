@@ -91,7 +91,7 @@
 <body>
 
     <div class="container">
-        <a href="index.html" class="back-link">← Back to Menu</a>
+        <a href="home.html" class="back-link">← Back to Menu</a>
         <h1>Checkout</h1>
 
         <div id="order-summary">
@@ -122,17 +122,14 @@
     </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // Load cart from localStorage (we need to pass cart data)
+    <script>
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         if (cart.length === 0) {
             alert("Cart is empty!");
-            window.location.href = 'index.html';
-        }
-
-        // Display Items
+            window.location.href = 'home.html';
+        }
         const itemsList = document.getElementById('items-list');
         cart.forEach(item => {
             const div = document.createElement('div');
@@ -142,9 +139,7 @@
             div.innerHTML = `<span>${item.quantity}x ${item.name}</span> <span>₹${item.price * item.quantity}</span>`;
             itemsList.appendChild(div);
         });
-        document.getElementById('checkout-total').innerText = total;
-
-        // Initialize Map
+        document.getElementById('checkout-total').innerText = total;
         const map = L.map('map').setView([13.0827, 80.2707], 13); // Default to Chennai center
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -153,9 +148,7 @@
         const marker = L.marker([13.0827, 80.2707], { draggable: true }).addTo(map);
 
         function updateLocation(lat, lng) {
-            document.getElementById('coordinates').value = JSON.stringify({ lat, lng });
-            // Ideally reverse geocode here, but for now just showing coords or specific string
-            // Using a simple fetch to nominatim for address
+            document.getElementById('coordinates').value = JSON.stringify({ lat, lng });
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
                 .then(res => res.json())
                 .then(data => {
@@ -164,9 +157,7 @@
                 .catch(() => {
                     document.getElementById('address').value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
                 });
-        }
-
-        // Initial update
+        }
         updateLocation(13.0827, 80.2707);
 
         marker.on('dragend', function (e) {
@@ -178,9 +169,7 @@
             const { lat, lng } = e.latlng;
             marker.setLatLng([lat, lng]);
             updateLocation(lat, lng);
-        });
-
-        // Try to get user's current location
+        });
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
@@ -188,21 +177,32 @@
                 marker.setLatLng([latitude, longitude]);
                 updateLocation(latitude, longitude);
             });
-        }
-
-        // Handle Form Submit
+        }
         document.getElementById('checkout-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const address = document.getElementById('address').value;
-            const coordinates = JSON.parse(document.getElementById('coordinates').value);
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const coordRaw = document.getElementById('coordinates').value;
+            let coordinates = { lat: 13.0827, lng: 80.2707 };
+            try {
+                if (coordRaw) coordinates = JSON.parse(coordRaw);
+            } catch (_) { /* use default */ }
+
+            if (!name || !phone) {
+                alert('Please fill in your name and phone number.');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-confirm');
+            btn.disabled = true;
+            btn.textContent = 'Placing Order...';
 
             const orderData = {
                 customer_name: name,
                 customer_phone: phone,
-                address: address,
+                address: address || 'Address not provided',
                 coordinates: coordinates,
                 total_amount: total,
                 items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price }))
@@ -216,21 +216,40 @@
                 });
 
                 const result = await response.json();
-                if (response.ok) {
-                    alert(`Order Placed Successfully! Order ID: ${result.orderId}`);
+
+                if (response.ok) {
+                    localStorage.setItem('my_phone', phone);
+                    const myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+                    myOrders.unshift({
+                        id: result.orderId,
+                        customer_name: name,
+                        customer_phone: phone,
+                        address: address || 'Not provided',
+                        total_amount: total,
+                        status: 'Pending',
+                        created_at: new Date().toISOString(),
+                        items: cart.map(i => ({ item_name: i.name, quantity: i.quantity, price: i.price }))
+                    });
+                    localStorage.setItem('my_orders', JSON.stringify(myOrders.slice(0, 20)));
+
                     localStorage.removeItem('cart');
-                    window.location.href = 'index.html';
-                } else {
-                    alert(`Failed to place order: ${result.message}`);
+                    alert(`✅ Order Placed Successfully!\nOrder ID: #${result.orderId}\nThank you, ${name}!\n\nYou will be redirected to track your order.`);
+                    window.location.href = 'my-orders.html';
+                } else {
+                    const errMsg = result.error || result.message || 'Something went wrong. Please try again.';
+                    alert(`❌ Failed to place order: ${errMsg}`);
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm Order';
                 }
             } catch (error) {
-                console.error("Error placing order:", error);
-                alert("Network error.");
+                console.error('Error placing order:', error);
+                alert('❌ Network error. Please check your connection and try again.');
+                btn.disabled = false;
+                btn.textContent = 'Confirm Order';
             }
         });
     </script>
-    <script>
-        // ... (existing script)
+    <script>
     </script>
     <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8rem;">
         App Version: 1.2 (Safe Mode Active)
