@@ -4,9 +4,10 @@ const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", controller.placeOrder); // Public (anyone can order)
-router.get("/", [auth.verifyToken, auth.isAdmin], controller.getAllOrders); // Admin view all
-router.get("/:id", [auth.verifyToken, auth.isAdmin], controller.getOrderDetails); // Admin view detail
-router.put("/:id/status", [auth.verifyToken, auth.isAdmin], controller.updateOrderStatus); // Admin update status
+router.post("/", controller.placeOrder);                                                          // Public
+router.get("/my", auth.verifyToken, controller.getMyOrders);                                      // Logged-in user
+router.get("/", [auth.verifyToken, auth.isAdmin], controller.getAllOrders);                       // Admin
+router.get("/:id", [auth.verifyToken, auth.isAdmin], controller.getOrderDetails);                // Admin
+router.put("/:id/status", [auth.verifyToken, auth.isAdmin], controller.updateOrderStatus);       // Admin
 
 module.exports = router;

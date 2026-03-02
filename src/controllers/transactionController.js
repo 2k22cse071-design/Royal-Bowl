@@ -21,7 +21,6 @@ exports.getTransactions = (req, res) => {
     const type = req.query.type;
     let query = "";
 
-    // Basic flexible filtering if extended later
     if (type === "weekly") {
         query = `SELECT * FROM transactions WHERE date >= date('now', '-7 days')`;
     } else if (type === "monthly") {

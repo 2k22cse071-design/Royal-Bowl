@@ -4,41 +4,59 @@ exports.placeOrder = (req, res) => {
     const { customer_name, customer_phone, items, total_amount, address, coordinates } = req.body;
 
     if (!items || items.length === 0) {
-        return res.status(400).json({ message: "No items in order" });
+        return res.status(400).json({ error: "No items in order" });
     }
 
-    // Transaction logic (manual as sqlite support varies, but single file helps)
+    let coordStr = '';
+    try {
+        if (typeof coordinates === 'string') {
+            coordStr = coordinates;
+        } else if (coordinates) {
+            coordStr = JSON.stringify(coordinates);
+        }
+    } catch (_) {
+        coordStr = '';
+    }
+
+    const safeName = (customer_name || '').toString().trim() || 'Guest';
+    const safePhone = (customer_phone || '').toString().trim() || 'N/A';
+    const safeAddress = (address || '').toString().trim() || 'Not provided';
+    const safeTotal = parseFloat(total_amount) || 0;
+
     db.serialize(() => {
-        // 1. Create Order
         db.run(
             "INSERT INTO orders (customer_name, customer_phone, total_amount, address, coordinates) VALUES (?, ?, ?, ?, ?)",
-            [customer_name, customer_phone, total_amount, address, JSON.stringify(coordinates)],
+            [safeName, safePhone, safeTotal, safeAddress, coordStr],
             function (err) {
                 if (err) {
-                    console.error("Order creation failed:", err);
-                    return res.status(500).json({ error: "Failed to create order" });
+                    console.error("❌ Order DB insert failed:", err.message);
+                    return res.status(500).json({ error: "Failed to create order: " + err.message });
                 }
 
                 const orderId = this.lastID;
 
-                // 2. Insert Order Items
-                const stmt = db.prepare("INSERT INTO order_items (order_id, item_name, quantity, price) VALUES (?, ?, ?, ?)");
+                const stmt = db.prepare(
+                    "INSERT INTO order_items (order_id, item_name, quantity, price) VALUES (?, ?, ?, ?)"
+                );
 
                 items.forEach(item => {
-                    // item structure: { name, quantity, price }
-                    stmt.run(orderId, item.name, item.quantity, item.price);
+                    stmt.run(orderId, item.name || 'Unknown', item.quantity || 1, parseFloat(item.price) || 0);
                 });
 
-                stmt.finalize();
-
-                res.status(201).json({ message: "Order placed successfully!", orderId });
+                stmt.finalize(finErr => {
+                    if (finErr) {
+                        console.error("❌ Order items insert failed:", finErr.message);
+                        return res.status(500).json({ error: "Order saved but items failed: " + finErr.message });
+                    }
+                    console.log(`✅ Order #${orderId} placed — ${items.length} item(s) — ₹${safeTotal}`);
+                    res.status(201).json({ message: "Order placed successfully!", orderId });
+                });
             }
         );
     });
 };
 
 exports.getAllOrders = (req, res) => {
-    // Basic fetch, in production we would optimize with joins if needed or pagination
     const query = `
         SELECT o.id, o.customer_name, o.total_amount, o.status, o.created_at,
         (SELECT json_group_array(json_object('name', oi.item_name, 'qty', oi.quantity)) 
@@ -47,9 +65,6 @@ exports.getAllOrders = (req, res) => {
         ORDER BY o.created_at DESC
     `;
 
-    // SQLite JSON extension might not be enabled by default in all envs. 
-    // Fallback: fetch orders then fetch items? 
-    // Let's stick to simple fetch of orders first for MVP list.
 
     const simpleQuery = "SELECT * FROM orders ORDER BY created_at DESC";
 
@@ -87,3 +102,34 @@ exports.getOrderDetails = (req, res) => {
         });
     });
 };
+
+exports.getMyOrders = (req, res) => {
+    const phone = (req.query.phone || '').trim();
+
+    const query = phone
+        ? "SELECT * FROM orders WHERE customer_phone = ? ORDER BY created_at DESC"
+        : "SELECT * FROM orders ORDER BY created_at DESC LIMIT 20";
+    const params = phone ? [phone] : [];
+
+    db.all(query, params, (err, orders) => {
+        if (err) {
+            console.error("getMyOrders error:", err);
+            return res.status(500).json({ error: "Fetch error" });
+        }
+        if (!orders || orders.length === 0) return res.json([]);
+
+        const results = [];
+        let done = 0;
+        orders.forEach(order => {
+            db.all("SELECT * FROM order_items WHERE order_id = ?", [order.id], (e, items) => {
+                results.push({ ...order, items: items || [] });
+                done++;
+                if (done === orders.length) {
+                    results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    res.json(results);
+                }
+            });
+        });
+    });
+};
+

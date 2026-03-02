@@ -15,7 +15,6 @@ exports.getMenu = (req, res) => {
 
 exports.addMenuItem = (req, res) => {
     const { name, price, description, category, image } = req.body;
-    // Basic validation
     if (!name || !price) {
         return res.status(400).json({ message: "Name and Price are required" });
     }

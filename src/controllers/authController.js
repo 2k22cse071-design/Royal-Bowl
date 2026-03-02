@@ -11,7 +11,6 @@ exports.login = (req, res) => {
 
     const cleanUsername = (username || "").trim();
 
-    // Check for Admin (Case Insensitive)
     if (cleanUsername.toLowerCase() === 'admin') {
         db.get("SELECT * FROM users WHERE username = ?", ["admin"], (err, user) => {
             if (err) return res.status(500).json({ message: "Server error" });
@@ -32,7 +31,6 @@ exports.login = (req, res) => {
             });
         });
     } else {
-        // Open access for ANY other input (User/Guest)
         const token = jwt.sign({ id: 'guest_' + Date.now(), role: 'user' }, JWT_SECRET, { expiresIn: 86400 });
 
         res.status(200).json({

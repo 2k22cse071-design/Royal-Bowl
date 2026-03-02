@@ -9,7 +9,6 @@ exports.verifyToken = (req, res, next) => {
         return res.status(403).json({ message: "No token provided!" });
     }
 
-    // Expect "Bearer <token>"
     const bearerToken = token.split(" ")[1];
     if (!bearerToken) {
         return res.status(403).json({ message: "Invalid token format!" });

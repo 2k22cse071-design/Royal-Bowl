@@ -7,7 +7,6 @@ require("dotenv").config();
 const dbPath = process.env.DB_PATH || "./data.db";
 const db = new sqlite3.Database(dbPath);
 
-// Initialize DB tables
 db.serialize(async () => {
   db.run(`
     CREATE TABLE IF NOT EXISTS transactions (
@@ -63,7 +62,6 @@ db.serialize(async () => {
     )
   `);
 
-  // Create default admin user if not exists
   db.get("SELECT * FROM users WHERE username = ?", ["admin"], (err, row) => {
     if (!row) {
       const password = "admin"; // Default password
@@ -74,7 +72,6 @@ db.serialize(async () => {
     }
   });
 
-  // Create default regular user for testing
   db.get("SELECT * FROM users WHERE username = ?", ["user"], (err, row) => {
     if (!row) {
       const password = "password";
@@ -85,7 +82,6 @@ db.serialize(async () => {
     }
   });
 
-  // Seed some menu items if empty (optional, for demo)
   db.get("SELECT count(*) as count FROM menu_items", (err, row) => {
     if (row && row.count === 0) {
       const items = [

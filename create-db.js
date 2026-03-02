@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./data.db'); // data.db file create aagum
+const db = new sqlite3.Database('./data.db'); 
 
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS transactions (
@@ -16,7 +16,6 @@ db.serialize(() => {
 
   console.log("✅ transactions table created successfully!");
 
-  // sample data insert panna (optional)
   db.run(`INSERT INTO transactions (order_id, amount, payment_method, status, items, customer_name, customer_email)
           VALUES ('ORD001', 450, 'Cash', 'Success', '["Chicken Biryani","Juice"]', 'Anu', 'anu@example.com')`);
 });
