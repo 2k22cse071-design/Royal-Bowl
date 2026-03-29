@@ -16,7 +16,7 @@ exports.addTransaction = (req, res) => {
         res.json({ success: true, id: this.lastID });
     });
 };
-
+//
 exports.getTransactions = (req, res) => {
     const type = req.query.type;
     let query = "";
