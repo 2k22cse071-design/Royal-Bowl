@@ -12,7 +12,7 @@ exports.getMenu = (req, res) => {
         res.json(rows);
     });
 };
-
+//
 exports.addMenuItem = (req, res) => {
     const { name, price, description, category, image } = req.body;
     if (!name || !price) {
@@ -35,6 +35,6 @@ exports.deleteMenuItem = (req, res) => {
             console.error(err);
             return res.status(500).json({ error: "Delete failed" });
         }
-        res.json({ message: "Item deleted" });
+        res.json({ message: "Item deleted..." });
     });
 };
